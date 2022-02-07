@@ -6,9 +6,9 @@ This is a minimum project with [Hono[炎]](https://github.com/yusukebe/hono/).
 
 - Minimum
 - TypeScript
-- Esbuild for build
-- miniflare 2.x for develop
-- Wrangler 2.0 Beta for publish
+- Esbuild to build
+- miniflare 2.x to develop
+- Wrangler 2.0 Beta to publish
 - Fast
 - Live reload
 
