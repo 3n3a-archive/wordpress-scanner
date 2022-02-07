@@ -1,0 +1,19 @@
+{
+  "name": "hono-minimum",
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "esbuild --bundle --sourcemap --outdir=dist ./src/index.ts",
+    "dev": "miniflare --live-reload --watch --debug",
+    "publish": "wrangler publish dist/index.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "hono": "*"
+  },
+  "devDependencies": {
+    "esbuild": "^0.14.19",
+    "miniflare": "^2.2.0",
+    "wrangler": "^0.0.15"
+  }
+}
