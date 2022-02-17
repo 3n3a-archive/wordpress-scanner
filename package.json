@@ -9,11 +9,11 @@
   },
   "license": "MIT",
   "dependencies": {
-    "hono": "*"
+    "hono": "^0.4.0"
   },
   "devDependencies": {
     "esbuild": "^0.14.19",
-    "miniflare": "^2.2.0",
+    "miniflare": "2.2.0",
     "wrangler": "^0.0.15"
   }
 }
