@@ -1,6 +1,6 @@
 # Hono minimum project
 
-This is a minimum project with [Hono[炎]](https://github.com/yusukebe/hono/).
+This is a minimum project with [Hono[炎]](https://github.com/yusukebe/hono/) for Cloudflare Workers.
 
 ## Features
 
@@ -8,7 +8,6 @@ This is a minimum project with [Hono[炎]](https://github.com/yusukebe/hono/).
 - TypeScript
 - Esbuild to build
 - miniflare 2.x to develop
-- Wrangler 2.0 Beta to publish
 - Fast
 - Live reload
 
