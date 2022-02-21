@@ -16,7 +16,14 @@ This is a minimal project with [Hono[炎]](https://github.com/yusukebe/hono/) fo
 Generate
 
 ```sh
-$ wrangler generate my-app git@github.com:yusukebe/hono-minimal.git
+$ wrangler generate my-app https://github.com/yusukebe/hono-minimal
+```
+
+Install
+
+```sh
+$ yarn install
+
 ```
 
 Develop
@@ -31,6 +38,10 @@ Publish
 ```sh
 $ yarn run publish
 ```
+
+## Examples
+
+See: <https://github.com/yusukebe/hono/tree/master/examples>
 
 ## Author
 
