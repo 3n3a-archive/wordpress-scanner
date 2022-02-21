@@ -1,23 +1,22 @@
-# Hono minimum project
+# Hono minimal project
 
-This is a minimum project with [Hono[炎]](https://github.com/yusukebe/hono/) for Cloudflare Workers.
+This is a minimal project with [Hono[炎]](https://github.com/yusukebe/hono/) for Cloudflare Workers.
 
 ## Features
 
-- Minimum
+- Minimal
 - TypeScript
-- Esbuild to build
-- miniflare 2.x to develop
+- [esbuild](https://github.com/evanw/esbuild) to build
+- [Miniflare](https://github.com/cloudflare/miniflare) to develop
 - Fast
 - Live reload
 
 ## Usage
 
-Install
+Generate
 
 ```sh
-$ git clone git@github.com:yusukebe/hono-minimum.git
-$ yarn install
+$ wrangler generate my-app git@github.com:yusukebe/hono-minimal.git
 ```
 
 Develop

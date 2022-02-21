@@ -1,4 +1,4 @@
-name="hono-minimum"
+name="hono-minimal"
 type = "javascript"
 workers_dev = true
 
