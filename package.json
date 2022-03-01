@@ -9,7 +9,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "hono": "^0.5.0"
+    "hono": "^0.5.1"
   },
   "devDependencies": {
     "esbuild": "^0.14.23",
