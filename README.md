@@ -17,32 +17,32 @@ This is a minimal project with [Hono[炎]](https://github.com/yusukebe/hono/) fo
 Initialize
 
 ```sh
-$ wrangler generate my-app https://github.com/yusukebe/hono-minimal
+wrangler generate my-app https://github.com/yusukebe/hono-minimal
 ```
 
 Install
 
 ```sh
-$ yarn install
+yarn install
 
 ```
 
 Develop
 
 ```sh
-$ yarn dev
+yarn dev
 ```
 
 Test
 
 ```
-$ yarn test
+yarn test
 ```
 
 Deploy
 
 ```
-$ yarn deploy
+yarn deploy
 ```
 
 ## Examples
