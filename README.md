@@ -1,6 +1,6 @@
 # Hono minimal project
 
-This is a minimal project with [Hono[炎]](https://github.com/yusukebe/hono/) for Cloudflare Workers.
+This is a minimal project with [Hono](https://github.com/yusukebe/hono/) for Cloudflare Workers.
 
 ## Features
 
