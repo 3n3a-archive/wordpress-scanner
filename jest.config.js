@@ -4,5 +4,4 @@ module.exports = {
   transform: {
     '^.+\\.(ts|tsx)$': 'esbuild-jest',
   },
-  resolver: 'jest-node-exports-resolver',
 }
