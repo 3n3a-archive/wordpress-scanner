@@ -1,6 +1,6 @@
 # Hono minimal project
 
-This is a minimal project with [Hono](https://github.com/yusukebe/hono/) for Cloudflare Workers.
+This is a minimal project with [Hono](https://github.com/honojs/hono/) for Cloudflare Workers.
 
 ## Features
 
@@ -17,14 +17,13 @@ This is a minimal project with [Hono](https://github.com/yusukebe/hono/) for Clo
 Initialize
 
 ```sh
-wrangler generate my-app https://github.com/yusukebe/hono-minimal
+wrangler generate my-app https://github.com/honojs/hono-minimal
 ```
 
 Install
 
 ```sh
 yarn install
-
 ```
 
 Develop
@@ -35,19 +34,19 @@ yarn dev
 
 Test
 
-```
+```sh
 yarn test
 ```
 
 Deploy
 
-```
+```sh
 yarn deploy
 ```
 
 ## Examples
 
-See: <https://github.com/yusukebe/hono/tree/master/examples>
+See: <https://github.com/honojs/hono/tree/master/examples>
 
 ## Author
 
