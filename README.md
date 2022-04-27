@@ -46,7 +46,7 @@ yarn deploy
 
 ## Examples
 
-See: <https://github.com/honojs/hono/tree/master/examples>
+See: <https://github.com/honojs/examples>
 
 ## Author
 
