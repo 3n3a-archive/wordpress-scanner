@@ -6,41 +6,38 @@ This is a minimal project with [Hono](https://github.com/honojs/hono/) for Cloud
 
 - Minimal
 - TypeScript
-- [esbuild](https://github.com/evanw/esbuild) to build
-- [Miniflare](https://github.com/cloudflare/miniflare) to develop
-- [Jest](https://jestjs.io/ja/) to test
-- Fast
-- Live reload
+- Wrangler to develop and deploy.
+- [esbuild](https://github.com/evanw/esbuild), [Miniflare](https://github.com/cloudflare/miniflare), and [Jest](https://jestjs.io/ja/) for testing
 
 ## Usage
 
 Initialize
 
-```sh
-wrangler generate my-app https://github.com/honojs/hono-minimal
+```
+npx create-cloudflare my-app https://github.com/honojs/hono-minimal
 ```
 
 Install
 
-```sh
+```
 yarn install
 ```
 
 Develop
 
-```sh
+```
 yarn dev
 ```
 
 Test
 
-```sh
+```
 yarn test
 ```
 
 Deploy
 
-```sh
+```
 yarn deploy
 ```
 

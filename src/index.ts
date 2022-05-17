@@ -26,13 +26,13 @@ app.get('/', (c) => c.html('<h1>Hello Hono!</h1>'))
 app.get('/auth/*', (c) => c.text('You are authorized'))
 
 // Nested route
-const book = app.route('/book')
+const book = new Hono()
 // Named path parameters
 book.get('/:id', (c) => {
   const id = c.req.param('id')
   return c.json({ 'Your book ID is': id })
 })
 book.post('/', (c) => c.text('Book is created', 201))
+app.route('/book', book)
 
-// addEventlistener...
-app.fire()
+export default app
