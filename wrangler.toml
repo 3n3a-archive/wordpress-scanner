@@ -1,5 +1,5 @@
 name="hono-minimal"
-workers_dev = true
+main="src/index.ts"
 
-compatibility_date = "2022-02-03"
+compatibility_date = "2022-07-18"
 

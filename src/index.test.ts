@@ -1,4 +1,4 @@
-import { app } from './index'
+import app from '.'
 
 describe('Test the application', () => {
   it('Should return 200 response', async () => {

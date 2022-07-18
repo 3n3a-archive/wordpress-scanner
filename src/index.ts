@@ -2,7 +2,7 @@ import { Hono } from 'hono'
 import { poweredBy } from 'hono/powered-by'
 import { basicAuth } from 'hono/basic-auth'
 
-export const app = new Hono()
+const app = new Hono()
 
 // Builtin middleware
 app.use('*', poweredBy())

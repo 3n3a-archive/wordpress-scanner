@@ -7,7 +7,7 @@ This is a minimal project with [Hono](https://github.com/honojs/hono/) for Cloud
 - Minimal
 - TypeScript
 - Wrangler to develop and deploy.
-- [esbuild](https://github.com/evanw/esbuild), [Miniflare](https://github.com/cloudflare/miniflare), and [Jest](https://jestjs.io/ja/) for testing
+- [Jest](https://jestjs.io/ja/) for testing.
 
 ## Usage
 
@@ -44,6 +44,10 @@ yarn deploy
 ## Examples
 
 See: <https://github.com/honojs/examples>
+
+## For more information
+
+See: <https://honojs.dev>
 
 ## Author
 
