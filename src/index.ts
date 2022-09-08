@@ -17,7 +17,7 @@ app.get('/', (c) => c.html('<h1>Hello WP!</h1>'))
 app.get('/:url', async (c) => {
   const url = decodeURIComponent(decodeURIComponent(c.req.param('url')))
   const res = await fetch(url)
-  c.html(await res.text())
+  return c.html(await res.text())
 })
 
 export default app
