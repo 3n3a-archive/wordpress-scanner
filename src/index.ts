@@ -14,7 +14,7 @@ app.use('*', async (c, next) => {
 
 // Routing
 app.get('/', (c) => c.html('<h1>Hello WP!</h1>'))
-app.get('/:url', (c) => c.html(
+app.get('/:url', async (c) => c.html(
   await fetch(c.req.param('url')
 ))
 
