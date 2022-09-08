@@ -1,4 +1,4 @@
-# Hono minimal project
+# Wordpress Scanner
 
 This is a minimal project with [Hono](https://github.com/honojs/hono/) for Cloudflare Workers.
 
