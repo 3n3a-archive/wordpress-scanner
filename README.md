@@ -1,6 +1,5 @@
 # Wordpress Scanner
 
-
 ## Features
 
 - Minimal
