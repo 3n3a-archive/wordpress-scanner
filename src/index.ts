@@ -1,6 +1,5 @@
 import { Hono } from 'hono'
 import { poweredBy } from 'hono/powered-by'
-import { basicAuth } from 'hono/basic-auth'
 
 const app = new Hono()
 
@@ -15,6 +14,8 @@ app.use('*', async (c, next) => {
 
 // Routing
 app.get('/', (c) => c.html('<h1>Hello WP!</h1>'))
-
+app.get('/:url', (c) => c.html(
+  await fetch(c.req.param('url')
+))
 
 export default app
