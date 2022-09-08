@@ -13,7 +13,22 @@ app.use('*', async (c, next) => {
 })
 
 // Routing
-app.get('/', (c) => c.html('<h1>Hello WP!</h1>'))
+app.get('/', (c) => {
+  return c.html(`
+  <body>
+    <label for="url">Enter a URL</label>
+    <input type="text" id="url" name="url" />
+    <button id="button">Scan</button>
+    <script>
+      let url = document.getElementById("url")
+      let btn = document.getElementById("button")
+      btn.addEventListener('click', () => {
+        window.location = window.location.origin + '/' + encodeURIComponent(url.value)
+      })
+    </script>
+  </body>
+  `)
+})
 app.get('/:url', async (c) => {
   const url = decodeURIComponent(decodeURIComponent(c.req.param('url')))
   const res = await fetch(url)
