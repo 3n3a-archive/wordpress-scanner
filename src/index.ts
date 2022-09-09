@@ -34,10 +34,10 @@ let versions = []
 app.get('/:url', async (c) => {
   const url = decodeURIComponent(decodeURIComponent(c.req.param('url')))
   const res = await fetch(url)
-  const not_used = new HTMLRewriter()
+  const not_used = await new HTMLRewriter()
     .on('script', new ScriptTagHandler())
     .on('link', new ScriptTagHandler('href'))
-    .transform(res);
+    .transform(res).text();
   return c.html(`Version: ${JSON.stringify(versions)}`)
 })
 
