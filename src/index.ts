@@ -29,10 +29,22 @@ app.get('/', (c) => {
   </body>
   `)
 })
+
+let versions = []
 app.get('/:url', async (c) => {
   const url = decodeURIComponent(decodeURIComponent(c.req.param('url')))
   const res = await fetch(url)
-  return c.html(await res.text())
+  const html = await res.text()
+  new HTMLRewriter().on('script', new ScriptTagHandler()).transform(html);
+  return c.html(`Version: ${JSON.stringify(versions)}`)
 })
+
+class ScriptTagHandler {
+  constructor() {}
+  element(e) {
+    const src = element.getAttribute('src')
+    versions.push(src)
+  }
+}
 
 export default app
