@@ -46,7 +46,7 @@ class ScriptTagHandler {
     this.attr = attr
   }
   element(e) {
-    const src = element.getAttribute(this.attr)
+    const src = e.getAttribute(this.attr)
     versions.push(src)
   }
 }
