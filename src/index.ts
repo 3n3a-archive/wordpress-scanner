@@ -34,14 +34,19 @@ let versions = []
 app.get('/:url', async (c) => {
   const url = decodeURIComponent(decodeURIComponent(c.req.param('url')))
   const res = await fetch(url)
-  new HTMLRewriter().on('script', new ScriptTagHandler()).transform(res);
+  new HTMLRewriter()
+    .on('script', new ScriptTagHandler())
+    .on('link', new ScriptTagHandler('href'))
+    .transform(res);
   return c.html(`Version: ${JSON.stringify(versions)}`)
 })
 
 class ScriptTagHandler {
-  constructor() {}
+  constructor(attr='src') {
+    this.attr = attr
+  }
   element(e) {
-    const src = element.getAttribute('src')
+    const src = element.getAttribute(this.attr)
     versions.push(src)
   }
 }
