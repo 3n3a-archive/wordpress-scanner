@@ -47,7 +47,7 @@ class ScriptTagHandler {
   }
   element(e) {
     const src = e.getAttribute(this.attr)
-    if(src.indexOf('ver') != -1) versions.push(src)
+    if(src && src.indexOf('ver') != -1) versions.push(src)
   }
 }
 
