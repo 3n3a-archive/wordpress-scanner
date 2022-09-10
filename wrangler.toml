@@ -1,5 +1,0 @@
-name="wordpress-scanner"
-main="src/index.ts"
-
-compatibility_date = "2022-07-18"
-
