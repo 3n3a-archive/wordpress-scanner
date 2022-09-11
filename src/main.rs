@@ -1,6 +1,8 @@
 #[macro_use]
 extern crate rocket;
 
+mod requestor;
+
 #[launch]
 fn rocket() -> _ {
     rocket::build()
@@ -8,6 +10,7 @@ fn rocket() -> _ {
 }
 
 #[get("/")]
-fn hello() -> &'static str {
-    "Hello, world!"
+async fn hello() -> String {
+    let text = requestor::get_site().await.unwrap();
+    text
 }
