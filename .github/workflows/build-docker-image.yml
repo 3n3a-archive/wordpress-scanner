@@ -7,6 +7,9 @@ jobs:
   release-docker:
     name: release docker image
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v3
       -
@@ -16,7 +19,7 @@ jobs:
         with:
           # list of Docker images to use as base name for tags
           images: |
-            3n3a/markdown-server
+            ghcr.io/3n3a/wordpress-scanner
           # generate Docker tags based on the following events/attributes
           tags: |
             type=semver,pattern={{version}}
@@ -28,15 +31,15 @@ jobs:
         name: Login to DockerHub
         uses: docker/login-action@v2
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       -
         name: Build and push
         uses: docker/build-push-action@v3
         with:
-          context: .
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=registry,ref=3n3a/markdown-server:latest
+          cache-from: type=registry,ref=3n3a/wordpress-scanner:latest
           cache-to: type=inline

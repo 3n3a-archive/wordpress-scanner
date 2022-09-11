@@ -35,24 +35,14 @@ COPY --from=builder /etc/group /etc/group
 WORKDIR /app
 
 # Copy our build
-COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/markdown-server ./
-COPY --from=builder /app/README.md /static/README.md
-
-
-RUN mkdir -p /assets && mkdir -p /generated && \
-    chown -R app:app /assets && \
-    chown -R app:app /generated && \
-    chown -R app:app /static
+COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/wordpress-scanner ./
 
 # Use an unprivileged user.
 USER app:app
 
 ENV ROCKET_ADDRESS="0.0.0.0"
-ENV ROCKET_IDENT=MarkdownServer
-ENV ASSETS_PATH="/assets"
-ENV PANDOC_IN_PATH="/static"
-ENV PANDOC_OUT_PATH="/generated"
+ENV ROCKET_IDENT=WordpressScanner
 
 EXPOSE 8000
 
-CMD ["/app/markdown-server"]
+CMD ["/app/wordpress-scanner"]

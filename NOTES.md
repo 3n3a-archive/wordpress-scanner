@@ -6,3 +6,12 @@
 
 * [pandoc crate (github)](https://github.com/oli-obk/rust-pandoc)
 * [pandoc crate (docs)](https://docs.rs/pandoc/latest/pandoc/)
+
+## Rust instal
+
+`curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh` 
+
+## Get Environemnt Variable at Runtime
+
+* See the `markdown-server` project
+* once_cell's **lazy**

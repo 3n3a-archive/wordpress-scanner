@@ -544,15 +544,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "itertools"
-version = "0.8.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f56a2d0bc861f9165be4eb3442afd3c236d8a98afd426f65d92324ae1091a484"
-dependencies = [
- "either",
-]
-
-[[package]]
 name = "itoa"
 version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -602,15 +593,6 @@ dependencies = [
  "serde_json",
  "tracing",
  "tracing-subscriber",
-]
-
-[[package]]
-name = "markdown-server"
-version = "0.1.0"
-dependencies = [
- "once_cell",
- "pandoc",
- "rocket",
 ]
 
 [[package]]
@@ -696,15 +678,6 @@ name = "opaque-debug"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "624a8340c38c1b80fd549087862da4ba43e08858af025b236e509b6649fc13d5"
-
-[[package]]
-name = "pandoc"
-version = "0.8.9"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0d4e5728b4bdfe27803e2376f1e4d07c19dc497d8bfb1bed87878b7815fa989a"
-dependencies = [
- "itertools",
-]
 
 [[package]]
 name = "parking_lot"
@@ -1477,6 +1450,13 @@ name = "windows_x86_64_msvc"
 version = "0.36.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c811ca4a8c853ef420abd8592ba53ddbbac90410fab6903b3e79972a631f7680"
+
+[[package]]
+name = "wordpress-scanner"
+version = "0.1.0"
+dependencies = [
+ "rocket",
+]
 
 [[package]]
 name = "yansi"
