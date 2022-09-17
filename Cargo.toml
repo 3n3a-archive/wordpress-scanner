@@ -15,3 +15,8 @@ reqwest = { version = "0.11.11", features = ["json"] }
 tokio = { version = "1.21.1", features = ["full"] }
 futures = "0.3.24"
 openssl = { version = "*", features = ["vendored"] }
+tera = "1"
+
+[dependencies.rocket_dyn_templates]
+version = "0.1.0-rc.2"
+features = ["tera"]
