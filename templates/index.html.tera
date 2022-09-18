@@ -1,65 +1,59 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title }}</title>
-</head>
-<body>
-    <div>
-        <div>
-            <h1>{{ title }}</h1>
-        </div>
-        <form id="input_form">
-            <label for="url">
-                Enter the URL to Scan:
-            </label>
-            <input type="url" name="url" id="url" placeholder="https://wordpress.org" />
-            <button type="submit">Scan</button>
-        </form>
-        <div>
-            <h2 id="output_url"></h2>
-            <pre id="output_el"></pre>
-        </div>
-    </div>
-    <script>
-        function c(t) {
-            return console.log(t)
-        }
+{% extends "base" %}
 
-        function e(q) {
-            return document.querySelector(q)
-        }
+{% block head %}
+    {{ super() }}
+{% endblock head %}
 
-        async function f(url) {
-            const res = await fetch(url)
-            const text = await res.text()
-            return text
-        }
+{% block content %}
+<div>
+    <h1>{{ title }}</h1>
+</div>
+<form action="/scan" method="post">
+    <label for="url">
+        Enter the URL to Scan:
+    </label>
+    <input type="url" name="url" id="url" placeholder="https://wordpress.org" />
+    <button type="submit">Scan</button>
+</form>
+{% endblock content %}
 
-        async function inputFormHandler(e) {
-            e.preventDefault();
-            let value = e.target[0].value
-            const urlEncoded = encodeURIComponent(value)
-            const res = await f(`/scan/${urlEncoded}`)
-            
-            inputUrlEl.value = ""
-            outputUrl.innerText = value
-            outputEl.innerText = res
-        }
+{# {% block scripts %}
+<script>
+    function c(t) {
+        return console.log(t)
+    }
 
-        function initListeners() {
-            inputForm.addEventListener('submit', inputFormHandler)
-        }
+    function e(q) {
+        return document.querySelector(q)
+    }
 
-        const inputUrlEl = e('input[name="url"]')
-        const inputForm = e('#input_form')
+    async function f(url) {
+        const res = await fetch(url)
+        const text = await res.text()
+        return text
+    }
 
-        const outputUrl = e('#output_url')
-        const outputEl = e('#output_el')
+    async function inputFormHandler(e) {
+        e.preventDefault();
+        let value = e.target[0].value
+        const urlEncoded = encodeURIComponent(value)
+        const res = await f(`/scan/${urlEncoded}`)
+        
+        inputUrlEl.value = ""
+        outputUrl.innerText = value
+        outputEl.innerText = res
+    }
 
-        initListeners()
-    </script>
-</body>
-</html>
+    function initListeners() {
+        inputForm.addEventListener('submit', inputFormHandler)
+    }
+
+    const inputUrlEl = e('input[name="url"]')
+    const inputForm = e('#input_form')
+
+    const outputUrl = e('#output_url')
+    const outputEl = e('#output_el')
+
+    initListeners()
+</script>
+{% endblock scripts %} #}

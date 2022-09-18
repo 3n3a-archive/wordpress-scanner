@@ -1,8 +1,11 @@
 #[macro_use]
 extern crate rocket;
+use rocket::form::Form;
 use rocket_dyn_templates::{Template, context};
+use url::Url;
 
 mod requestor;
+mod types;
 
 #[launch]
 fn rocket() -> _ {
@@ -20,8 +23,19 @@ fn index() -> Template {
     Template::render("index", &context)
 }
 
-#[get("/<url>")]
-async fn scan_site(url: &str) -> String {
-    let text = requestor::get_site(url).await.unwrap();
-    text
+#[post("/", data = "<input>")]
+async fn scan_site(input: Form<types::ScanForm<'_>>) -> Template {
+    let url_host = Url::parse(input.url).unwrap();
+    let (source_title, source_code, headers) = requestor::get_site(input.url).await;
+
+    let context = context! {
+        title: "Scan Result",
+        url: input.url,
+        url_host: url_host.host_str(),
+        headers: &headers,
+        source_title: source_title,
+        source_code: source_code
+    };
+
+    Template::render("scan", &context)
 }
