@@ -31,14 +31,14 @@ pub async fn get_site(url: &str) -> (String, String, HashMap<String, String>) {
     let result = client.get(url)
         .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36")
         .send()
-        .await
+        .await // no '?' because we'd have to use Result as return type
         .unwrap();
 
     // Headers before .text()
-    let res_headers = &result.headers().clone();
+    let res_headers = &result.headers().clone(); // clone so can still return it (because .text() takes over ownership)
     let mut headers = HashMap::new();
     for (key, value) in res_headers.iter() {
-        let value_string = value.to_str().unwrap_or(&"").to_string();
+        let value_string = value.to_str().unwrap_or(&"").to_string(); // unwrap_or because it fails with UTF-8 Symbols lol
         headers.insert(key.to_string(), value_string);
     }
     
