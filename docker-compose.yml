@@ -1,0 +1,6 @@
+version: '3'
+services:
+  wordpress-scanner:
+    image: ghcr.io/3n3a/wordpress-scanner:0.2.0-alpha
+    ports:
+      - 8006:8000
