@@ -26,15 +26,27 @@ fn index() -> Template {
 #[post("/", data = "<input>")]
 async fn scan_site(input: Form<types::ScanForm<'_>>) -> Template {
     let url_host = Url::parse(input.url).unwrap();
-    let (source_title, source_code, headers) = requestor::get_site(input.url).await;
+    let (
+        source_title, 
+        source_code, 
+        headers,
+        status_code,
+        status_reason,
+        css_list
+    ) = requestor::get_site(input.url).await;
+
+    // println!("{:#?}", &css_list.as_slice());
 
     let context = context! {
         title: "Scan Result",
         url: input.url,
         url_host: url_host.host_str(),
         headers: &headers,
+        status_code: status_code,
+        status_reason: status_reason,
         source_title: source_title,
-        source_code: source_code
+        source_code: source_code,
+        css_list: &css_list.as_slice(),
     };
 
     Template::render("scan", &context)

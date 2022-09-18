@@ -9,10 +9,22 @@
 
 {% block content %}
 <div>
+    <a href="/">⬅️ Back</a>
     <h1>{{ title }} of <i>{{ url_host }}</i></h1>
     <a href="{{ url }}" target="_blank">Go to Original Page</a>
 </div>
 <div>
+    <div>
+        <h2>Status</h2>
+        <p>
+            <strong>Status Code:</strong>
+            {{ status_code }}
+        </p>
+        <p>
+            <strong>Status Reason:</strong>
+            {{ status_reason }}
+        </p>
+    </div>
     <div>
         <h2>Headers</h2>
         {% if headers %}
@@ -26,6 +38,20 @@
         </ul>
         {% else %}
         <p>No headers found</p>
+        {% endif %}
+    </div>
+    <div>
+        <h2>CSS Stylesheet List</h2>
+        {% if css_list %}
+        <ul>
+            {% for css_url in css_list %}
+                <li>
+                    {{css_url}}
+                </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>No css links found</p>
         {% endif %}
     </div>
     <div>
