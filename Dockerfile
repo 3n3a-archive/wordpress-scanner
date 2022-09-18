@@ -36,6 +36,8 @@ WORKDIR /app
 
 # Copy our build
 COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/wordpress-scanner ./
+COPY --from=builder /app/templates/ ./templates/
+RUN ls -lha ./templates
 
 # Use an unprivileged user.
 USER app:app
