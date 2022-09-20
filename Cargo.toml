@@ -23,7 +23,8 @@ version = "0.6.0"
 features = ["runtime-tokio-rustls"]
 
 [dependencies.rocket_auth]
-path = "./rocket_auth"
+git = "https://github.com/3n3a/rocket_auth"
+branch = "master"
 features = ["sqlx-sqlite"]
 
 [dependencies.rocket_dyn_templates]

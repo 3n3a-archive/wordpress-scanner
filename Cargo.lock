@@ -1943,6 +1943,7 @@ dependencies = [
 [[package]]
 name = "rocket_auth"
 version = "0.4.0"
+source = "git+https://github.com/3n3a/rocket_auth?branch=master#5c638a60a05af34d43bde9bd4eeca43a00b05eae"
 dependencies = [
  "async-trait",
  "chashmap",
