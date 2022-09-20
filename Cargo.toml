@@ -19,7 +19,7 @@ serde_json = "1.0.82"
 
 
 [dependencies.sqlx]
-version = "0.6.0"
+version = "0.6.2"
 features = ["runtime-tokio-rustls"]
 
 [dependencies.rocket_auth]
