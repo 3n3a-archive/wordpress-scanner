@@ -35,7 +35,7 @@ COPY --from=builder /etc/group /etc/group
 WORKDIR /app
 
 # Copy our build
-COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/wordpress-scanner ./
+COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/m183-totp ./
 COPY --from=builder /app/templates/ ./templates/
 RUN ls -lha ./templates
 
@@ -43,8 +43,8 @@ RUN ls -lha ./templates
 USER app:app
 
 ENV ROCKET_ADDRESS="0.0.0.0"
-ENV ROCKET_IDENT=WordpressScanner
+ENV ROCKET_IDENT=M183TOTP
 
 EXPOSE 8000
 
-CMD ["/app/wordpress-scanner"]
+CMD ["/app/m183-totp"]

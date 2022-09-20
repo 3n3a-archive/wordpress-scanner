@@ -1,59 +1,13 @@
 {% extends "base" %}
+{% block body %}
+{% if user %}
+Hello there, your email is {{ user.email }}.
+<br><a href="/delete">Delete your account.</a>
 
-{% block head %}
-    {{ super() }}
-{% endblock head %}
-
-{% block content %}
-<div>
-    <h1>{{ title }}</h1>
-</div>
-<form action="/scan" method="post">
-    <label for="url">
-        Enter the URL to Scan:
-    </label>
-    <input type="url" name="url" id="url" placeholder="https://wordpress.org" />
-    <button type="submit">Scan</button>
-</form>
-{% endblock content %}
-
-{# {% block scripts %}
-<script>
-    function c(t) {
-        return console.log(t)
-    }
-
-    function e(q) {
-        return document.querySelector(q)
-    }
-
-    async function f(url) {
-        const res = await fetch(url)
-        const text = await res.text()
-        return text
-    }
-
-    async function inputFormHandler(e) {
-        e.preventDefault();
-        let value = e.target[0].value
-        const urlEncoded = encodeURIComponent(value)
-        const res = await f(`/scan/${urlEncoded}`)
-        
-        inputUrlEl.value = ""
-        outputUrl.innerText = value
-        outputEl.innerText = res
-    }
-
-    function initListeners() {
-        inputForm.addEventListener('submit', inputFormHandler)
-    }
-
-    const inputUrlEl = e('input[name="url"]')
-    const inputForm = e('#input_form')
-
-    const outputUrl = e('#output_url')
-    const outputEl = e('#output_el')
-
-    initListeners()
-</script>
-{% endblock scripts %} #}
+{% endif %}
+{% if not user %}
+Hello, anonymous user.
+{% endif %}
+<br>
+<a href="show_all_users">Show all users</a>
+{% endblock body %}

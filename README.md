@@ -1,3 +1,3 @@
-# Wordpress Scanner
+# m183-totp
 
-> Scan WP for Security
+> TOTP example application in rust's rocket

@@ -1,53 +1,88 @@
-#[macro_use]
-extern crate rocket;
-use rocket::form::Form;
-use rocket_dyn_templates::{Template, context};
-use url::Url;
+use rocket::{State, form::*, get, post, response::Redirect, routes};
+use rocket_auth::{prelude::Error, *};
+use rocket_dyn_templates::Template;
+use serde_json::json;
+use sqlx::*;
 
-mod requestor;
-mod types;
+use std::result::Result;
+use std::*;
+#[get("/login")]
+fn get_login() -> Template {
+    Template::render("login", json!({}))
+}
 
-#[launch]
-fn rocket() -> _ {
-    rocket::build()
-        .mount("/", routes![index])
-        .mount("/scan", routes![scan_site])
-        .attach(Template::fairing())
+#[post("/login", data = "<form>")]
+async fn post_login(auth: Auth<'_>, form: Form<Login>) -> Result<Redirect, Error> {
+    let result = auth.login(&form).await;
+    println!("login attempt: {:?}", result);
+    result?;
+    Ok(Redirect::to("/"))
+}
+
+#[get("/signup")]
+async fn get_signup() -> Template {
+    Template::render("signup", json!({}))
+}
+
+#[post("/signup", data = "<form>")]
+async fn post_signup(auth: Auth<'_>, form: Form<Signup>) -> Result<Redirect, Error> {
+    auth.signup(&form).await?;
+    auth.login(&form.into()).await?;
+
+    Ok(Redirect::to("/"))
 }
 
 #[get("/")]
-fn index() -> Template {
-    let context = context! {
-        title: "Wordpress Scanner"
-    };
-    Template::render("index", &context)
+async fn index(user: Option<User>) -> Template {
+    Template::render("index", json!({ "user": user }))
 }
 
-#[post("/", data = "<input>")]
-async fn scan_site(input: Form<types::ScanForm<'_>>) -> Template {
-    let url_host = Url::parse(input.url).unwrap();
-    let (
-        source_title, 
-        source_code, 
-        headers,
-        status_code,
-        status_reason,
-        css_list
-    ) = requestor::get_site(input.url).await;
+#[get("/logout")]
+fn logout(auth: Auth<'_>) -> Result<Template, Error> {
+    auth.logout()?;
+    Ok(Template::render("logout", json!({})))
+}
+#[get("/delete")]
+async fn delete(auth: Auth<'_>) -> Result<Template, Error> {
+    auth.delete().await?;
+    Ok(Template::render("deleted", json!({})))
+}
 
-    // println!("{:#?}", &css_list.as_slice());
+#[get("/show_all_users")]
+async fn show_all_users(conn: &State<SqlitePool>, user: Option<User>) -> Result<Template, Error> {
+    let users: Vec<User> = query_as("select * from users;").fetch_all(&**conn).await?;
+    println!("{:?}", users);
+    Ok(Template::render(
+        "users",
+        json!({"users": users, "user": user}),
+    ))
+}
 
-    let context = context! {
-        title: "Scan Result",
-        url: input.url,
-        url_host: url_host.host_str(),
-        headers: &headers,
-        status_code: status_code,
-        status_reason: status_reason,
-        source_title: source_title,
-        source_code: source_code,
-        css_list: &css_list.as_slice(),
-    };
+#[tokio::main]
+async fn main() -> Result<(), Error> {
+    let conn = SqlitePool::connect("database.db").await?;
+    let users: Users = conn.clone().into();
+    users.create_table().await?; 
 
-    Template::render("scan", &context)
+    let _ = rocket::build()
+        .mount(
+            "/",
+            routes![
+                index,
+                get_login,
+                post_signup,
+                get_signup,
+                post_login,
+                logout,
+                delete,
+                show_all_users,
+            ],
+        )
+        .manage(conn)
+        .manage(users)
+        .attach(Template::fairing())
+        .launch()
+        .await
+        .unwrap();
+    Ok(())
 }

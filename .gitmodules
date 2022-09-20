@@ -1,0 +1,3 @@
+[submodule "rocket_auth"]
+	path = rocket_auth
+	url = https://github.com/tvallotton/rocket_auth
