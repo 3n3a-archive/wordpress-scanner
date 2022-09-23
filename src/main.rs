@@ -32,7 +32,8 @@ async fn scan_site(input: Form<types::ScanForm<'_>>) -> Template {
         headers,
         status_code,
         status_reason,
-        css_list
+        css_list,
+        version
     ) = requestor::get_site(input.url).await;
 
     // println!("{:#?}", &css_list.as_slice());
@@ -46,6 +47,7 @@ async fn scan_site(input: Form<types::ScanForm<'_>>) -> Template {
         status_reason: status_reason,
         source_title: source_title,
         source_code: source_code,
+        source_version: version,
         css_list: &css_list.as_slice(),
     };
 
