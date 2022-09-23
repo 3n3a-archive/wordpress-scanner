@@ -1,5 +1,11 @@
 on:
   push:
+    paths:
+        - src/**
+        - templates/**
+        - Cargo.toml
+        - Cargo.lock
+        - Dockerfile
 
 jobs:
   release-docker:
