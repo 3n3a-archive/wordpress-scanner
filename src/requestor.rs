@@ -7,6 +7,7 @@ mod parsers {
     pub fn parse_html(html: &String) -> (String, Vec<String>) {
         let mut global_title: String = String::new();
         let mut global_css_list = Vec::new();
+        let mut global_version: String = String::new();
 
         let element_content_handlers = vec![
             text!("head > title", |t| {
@@ -21,6 +22,11 @@ mod parsers {
                 let href = e.get_attribute("href").unwrap();
                 global_css_list.push(href);
                 Ok(())
+            }),
+            element!("head > meta[name=\"generator\"]", |e| {
+                let version = e.get_attribute("content").unwrap();
+                global_version = version;
+                Ok(())
             })
         ];
         rewrite_str(
@@ -30,7 +36,7 @@ mod parsers {
                 ..RewriteStrSettings::default()
             }
         ).unwrap();
-        return (global_title, global_css_list);
+        return (global_title, global_css_list, global_version);
     }
 }
 
@@ -55,7 +61,7 @@ pub async fn get_site(url: &str) -> (String, String, HashMap<String, String>, St
     
     // .text() destroys the variable, like kinda 
     let source_code = &result.text().await.unwrap();
-    let (title, css_list) = parsers::parse_html(&source_code);
+    let (title, css_list, version) = parsers::parse_html(&source_code);
 
     (
         title, 
@@ -63,6 +69,7 @@ pub async fn get_site(url: &str) -> (String, String, HashMap<String, String>, St
         headers, 
         status_code, 
         status_reason, 
-        css_list
+        css_list,
+        version
     )
 }
