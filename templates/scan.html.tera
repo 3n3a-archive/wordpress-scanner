@@ -61,8 +61,18 @@
             <code class="language-markup">{{ source_title }}</code>
         </p>
         <p>
-            <strong>Page Version: </strong>
-            <code class="language-markup">{{ source_version }}</code>
+            <strong>Page Version(s): </strong>
+            {% if source_version %}
+            <ul>
+                {% for version in source_version %}
+                    <li>
+                        <code class="language-markup">{{ version }}</code>
+                    </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>No version(s) found</p>
+            {% endif %}
         </p>
         {% if source_code %}
         <details>

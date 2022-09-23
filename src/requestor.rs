@@ -4,10 +4,10 @@ use std::collections::HashMap;
 mod parsers {
     use lol_html::{element, rewrite_str, text, RewriteStrSettings};
 
-    pub fn parse_html(html: &String) -> (String, Vec<String>, String) {
+    pub fn parse_html(html: &String) -> (String, Vec<String>, Vec<String>) {
         let mut global_title: String = String::new();
         let mut global_css_list = Vec::new();
-        let mut global_version: String = String::new();
+        let mut global_version: Vec<String> = Vec::new();
 
         let element_content_handlers = vec![
             text!("head > title", |t| {
@@ -25,7 +25,7 @@ mod parsers {
             }),
             element!("head > meta[name=\"generator\"]", |e| {
                 let version = e.get_attribute("content").unwrap();
-                global_version = version;
+                global_version.push(version);
                 Ok(())
             }),
         ];
@@ -50,7 +50,7 @@ pub async fn get_site(
     String,
     String,
     Vec<String>,
-    String,
+    Vec<String>,
 ) {
     let client = reqwest::Client::new();
     let result = client.get(url)
