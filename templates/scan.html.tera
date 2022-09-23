@@ -60,6 +60,10 @@
             <strong>Page Title: </strong>
             <code class="language-markup">{{ source_title }}</code>
         </p>
+        <p>
+            <strong>Page Version: </strong>
+            <code class="language-markup">{{ source_version }}</code>
+        </p>
         {% if source_code %}
         <details>
             <summary>Show Source Code</summary>
