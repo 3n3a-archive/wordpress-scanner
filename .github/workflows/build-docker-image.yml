@@ -41,5 +41,5 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-         # cache-from: type=registry,ref=3n3a/wordpress-scanner:latest
-         # cache-to: type=inline
+          cache-from: type=registry,ref=ghcr.io/3n3a/wordpress-scanner:latest
+          cache-to: type=inline
