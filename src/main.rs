@@ -1,7 +1,7 @@
 #[macro_use]
 extern crate rocket;
 use rocket::form::Form;
-use rocket_dyn_templates::{Template, context};
+use rocket_dyn_templates::{context, Template};
 use url::Url;
 
 mod requestor;
@@ -26,15 +26,8 @@ fn index() -> Template {
 #[post("/", data = "<input>")]
 async fn scan_site(input: Form<types::ScanForm<'_>>) -> Template {
     let url_host = Url::parse(input.url).unwrap();
-    let (
-        source_title, 
-        source_code, 
-        headers,
-        status_code,
-        status_reason,
-        css_list,
-        version
-    ) = requestor::get_site(input.url).await;
+    let (source_title, source_code, headers, status_code, status_reason, css_list, version) =
+        requestor::get_site(input.url).await;
 
     // println!("{:#?}", &css_list.as_slice());
 

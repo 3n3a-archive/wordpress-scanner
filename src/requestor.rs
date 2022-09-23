@@ -2,9 +2,9 @@ use reqwest;
 use std::collections::HashMap;
 
 mod parsers {
-    use lol_html::{rewrite_str, text, element, RewriteStrSettings};
+    use lol_html::{element, rewrite_str, text, RewriteStrSettings};
 
-    pub fn parse_html(html: &String) -> (String, Vec<String>) {
+    pub fn parse_html(html: &String) -> (String, Vec<String>, String) {
         let mut global_title: String = String::new();
         let mut global_css_list = Vec::new();
         let mut global_version: String = String::new();
@@ -27,20 +27,31 @@ mod parsers {
                 let version = e.get_attribute("content").unwrap();
                 global_version = version;
                 Ok(())
-            })
+            }),
         ];
         rewrite_str(
             html.as_str(),
             RewriteStrSettings {
                 element_content_handlers,
                 ..RewriteStrSettings::default()
-            }
-        ).unwrap();
+            },
+        )
+        .unwrap();
         return (global_title, global_css_list, global_version);
     }
 }
 
-pub async fn get_site(url: &str) -> (String, String, HashMap<String, String>, String, String, Vec<String>) {
+pub async fn get_site(
+    url: &str,
+) -> (
+    String,
+    String,
+    HashMap<String, String>,
+    String,
+    String,
+    Vec<String>,
+    String,
+) {
     let client = reqwest::Client::new();
     let result = client.get(url)
         .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36")
@@ -58,18 +69,18 @@ pub async fn get_site(url: &str) -> (String, String, HashMap<String, String>, St
         let value_string = value.to_str().unwrap_or(&"").to_string(); // unwrap_or because it fails with UTF-8 Symbols lol
         headers.insert(key.to_string(), value_string);
     }
-    
-    // .text() destroys the variable, like kinda 
+
+    // .text() destroys the variable, like kinda
     let source_code = &result.text().await.unwrap();
     let (title, css_list, version) = parsers::parse_html(&source_code);
 
     (
-        title, 
-        source_code.to_owned(), 
-        headers, 
-        status_code, 
-        status_reason, 
+        title,
+        source_code.to_owned(),
+        headers,
+        status_code,
+        status_reason,
         css_list,
-        version
+        version,
     )
 }
