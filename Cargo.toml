@@ -13,7 +13,7 @@ lto = true
 rocket = "0.5.0-rc.2"
 reqwest = { version = "0.11.12", features = ["json"] }
 tokio = { version = "1.21.2", features = ["full"] }
-futures = "0.3.24"
+futures = "0.3.25"
 openssl = { version = "*", features = ["vendored"] }
 tera = "1"
 lol_html = "0.3.1"
