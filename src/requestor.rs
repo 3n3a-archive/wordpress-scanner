@@ -9,6 +9,8 @@ mod parsers {
         let mut global_css_list = Vec::new();
         let mut global_version: Vec<String> = Vec::new();
 
+        let mut r_global_version = &mut global_version;
+
         let element_content_handlers = vec![
             text!("head > title", |t| {
                 global_title += t.as_str();
@@ -24,13 +26,15 @@ mod parsers {
                 Ok(())
             }),
             element!("head > meta[name=\"generator\"]", |e| {
+                let r1_gv = &mut r_global_version;
                 let version = e.get_attribute("content").unwrap();
-                global_version.push(version);
+                r1_gv.push(version);
                 Ok(())
             }),
             element!("head > meta[name=\"Generator\"]", |e| {
+                let r2_gv = &mut r_global_version;
                 let version = e.get_attribute("content").unwrap();
-                global_version.push(version);
+                r2_gv.push(version);
                 Ok(())
             }),
         ];
