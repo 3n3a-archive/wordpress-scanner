@@ -28,6 +28,11 @@ mod parsers {
                 global_version.push(version);
                 Ok(())
             }),
+            element!("head > meta[name=\"Generator\"]", |e| {
+                let version = e.get_attribute("content").unwrap();
+                global_version.push(version);
+                Ok(())
+            }),
         ];
         rewrite_str(
             html.as_str(),
