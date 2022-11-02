@@ -25,16 +25,10 @@ mod parsers {
                 global_css_list.push(href);
                 Ok(())
             }),
-            element!("head > meta[name=\"generator\"]", |e| {
+            element!("head > meta[name=\"generator\" i]", |e| {
                 let r1_gv = &mut r_global_version;
                 let version = e.get_attribute("content").unwrap();
                 r1_gv.push(version);
-                Ok(())
-            }),
-            element!("head > meta[name=\"Generator\"]", |e| {
-                let r2_gv = &mut r_global_version;
-                let version = e.get_attribute("content").unwrap();
-                r2_gv.push(version);
                 Ok(())
             }),
         ];
