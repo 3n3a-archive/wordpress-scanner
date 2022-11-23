@@ -85,7 +85,7 @@ async fn scan_site(input: Form<types::ScanForm<'_>>) -> Json<types::ScanResult<'
 async fn scan_site_old(input: Form<types::ScanForm<'_>>) -> Template {
     let url_host = Url::parse(input.url).unwrap();
     let (source_title, source_code, headers, status_code, status_reason, css_list, version_list) =
-        requestor::get_site(input.url).await;
+        requestor::get_site(url_host.clone()).await;
 
     // println!("{:#?}", &css_list.as_slice());
 

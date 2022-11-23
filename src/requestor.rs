@@ -1,4 +1,4 @@
-use reqwest::{self, header::USER_AGENT, Response, Client};
+use reqwest::{self, header::USER_AGENT, Response, Client, Url};
 use std::collections::HashMap;
 
 mod config;
@@ -11,11 +11,20 @@ async fn make_req(client: Client, url: &str) -> Response {
         .send()
         .await // no '?' because we'd have to use Result as return type
         .unwrap();
-    return result;
+    result
+}
+
+fn create_robots_txt_url(url: Url) -> String {
+    const ROBOTS_TXT: &'static str = "robots.txt";
+    let schema = url.scheme();
+    let host = url.host_str().unwrap();
+    let port = url.port_or_known_default().unwrap();
+    let url: String = format!("{}://{}:{}/{}", schema, host, port, ROBOTS_TXT);
+    url
 }
 
 pub async fn get_site(
-    url: &str,
+    url: Url,
 ) -> (
     String,
     String,
@@ -26,7 +35,11 @@ pub async fn get_site(
     Vec<String>,
 ) {
     let client = reqwest::Client::new();
-    let result = make_req(client, url).await;
+    let result = make_req(client.clone(), url.as_str()).await;
+
+    let robots_url = create_robots_txt_url(url).to_owned();
+    let result_robots = make_req(client.clone(), &robots_url).await;
+    println!("robots.txt {}", &result_robots.text().await.unwrap());
 
     let status_code: String = (*(&result.status().to_owned())).to_string();
     let status_reason: String = (*(&result.status().canonical_reason().unwrap_or(""))).to_string();
