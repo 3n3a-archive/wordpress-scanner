@@ -1,48 +1,8 @@
-use reqwest;
+use reqwest::{self, header::USER_AGENT};
 use std::collections::HashMap;
 
-mod parsers {
-    use lol_html::{element, rewrite_str, text, RewriteStrSettings};
-
-    pub fn parse_html(html: &String) -> (String, Vec<String>, Vec<String>) {
-        let mut global_title: String = String::new();
-        let mut global_css_list = Vec::new();
-        let mut global_version: Vec<String> = Vec::new();
-
-        let mut r_global_version = &mut global_version;
-
-        let element_content_handlers = vec![
-            text!("head > title", |t| {
-                global_title += t.as_str();
-                if t.last_in_text_node() {
-                    global_title += "";
-                }
-                Ok(())
-            }),
-            element!("head > link[rel=\"stylesheet\"]", |e| {
-                // push into vector or so
-                let href = e.get_attribute("href").unwrap();
-                global_css_list.push(href);
-                Ok(())
-            }),
-            element!("head > meta[name=\"generator\" i]", |e| {
-                let r1_gv = &mut r_global_version;
-                let version = e.get_attribute("content").unwrap();
-                r1_gv.push(version);
-                Ok(())
-            }),
-        ];
-        rewrite_str(
-            html.as_str(),
-            RewriteStrSettings {
-                element_content_handlers,
-                ..RewriteStrSettings::default()
-            },
-        )
-        .unwrap();
-        return (global_title, global_css_list, global_version);
-    }
-}
+mod config;
+mod parsers;
 
 pub async fn get_site(
     url: &str,
@@ -57,7 +17,7 @@ pub async fn get_site(
 ) {
     let client = reqwest::Client::new();
     let result = client.get(url)
-        .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36")
+        .header(USER_AGENT, config::get_random_user_agent())
         .send()
         .await // no '?' because we'd have to use Result as return type
         .unwrap();
