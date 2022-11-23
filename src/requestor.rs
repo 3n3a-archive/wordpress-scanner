@@ -1,8 +1,18 @@
-use reqwest::{self, header::USER_AGENT};
+use reqwest::{self, header::USER_AGENT, Response, Client};
 use std::collections::HashMap;
 
 mod config;
 mod parsers;
+
+// makes a request with a random user-agent
+async fn make_req(client: Client, url: &str) -> Response {
+    let result = client.get(url)
+        .header(USER_AGENT, config::get_random_user_agent())
+        .send()
+        .await // no '?' because we'd have to use Result as return type
+        .unwrap();
+    return result;
+}
 
 pub async fn get_site(
     url: &str,
@@ -16,11 +26,7 @@ pub async fn get_site(
     Vec<String>,
 ) {
     let client = reqwest::Client::new();
-    let result = client.get(url)
-        .header(USER_AGENT, config::get_random_user_agent())
-        .send()
-        .await // no '?' because we'd have to use Result as return type
-        .unwrap();
+    let result = make_req(client, url).await;
 
     let status_code: String = (*(&result.status().to_owned())).to_string();
     let status_reason: String = (*(&result.status().canonical_reason().unwrap_or(""))).to_string();
