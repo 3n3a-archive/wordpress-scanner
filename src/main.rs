@@ -29,26 +29,26 @@ fn index() -> Template {
 }
 
 #[post("/", data = "<input>")]
-async fn scan_site(input: Form<types::ScanForm<'_>>) -> Json<types::ScanResult<'_>> {
+async fn scan_site(input: Form<types::ScanForm<'_>>) -> Json<types::ScanResult> {
     let url_host = Url::parse(input.url).unwrap();
-    let (document_info, req_info): (types::DocumentInfo<'_>, types::ReqInfo<'_>) = get_site(url_host.clone()).await;
-    let scan_result: ScanResult<'_> = ScanResult {
+    let (document_info, req_info): (types::DocumentInfo, types::ReqInfo) = get_site(url_host.clone()).await;
+    let scan_result: ScanResult = ScanResult {
         url_info: types::UrlInfo {
-            original_url: "https://example.com/index.html",
-            host: "example.com",
-            scheme: "https",
-            port: "443",
+            original_url: "https://example.com/index.html".to_string(),
+            host: "example.com".to_string(),
+            scheme: "https".to_string(),
+            port: "443".to_string(),
         },
         req_info: req_info,
         document_info: document_info,
         time_info: types::TimeInfo {
-            created_at: "Mon 21 November 2022 19:47:22.143 UTC",
-            timezone: "UTC"
+            created_at: "Mon 21 November 2022 19:47:22.143 UTC".to_string(),
+            timezone: "UTC".to_string()
         },
         framework_info: types::FrameworkInfo {
-            name: "Wordpress",
-            version: "6.2.1",
-            server: "Nginx/123",
+            name: "Wordpress".to_string(),
+            version: "6.2.1".to_string(),
+            server: "Nginx/123".to_string(),
             detected_vulnerabilities: vec![]
         },
     };

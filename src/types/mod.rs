@@ -65,102 +65,102 @@ pub struct ScanForm<'r> {
 // the static str (&str)
 #[derive(Serialize)]
 #[serde(crate = "rocket::serde")]
-pub struct UrlInfo<'r> {
-    pub original_url: &'r str,
-    pub host: &'r str, // url.host_str()
-    pub scheme: &'r str, // url.scheme (is already str)
-    pub port: &'r str, // url.port_or_known_default(), can be None, .to_string().as_str()
+pub struct UrlInfo {
+    pub original_url: String,
+    pub host: String, // url.host_str()
+    pub scheme: String, // url.scheme (is already str)
+    pub port: String, // url.port_or_known_default(), can be None, .to_string().as_str()
 }
 
 // represents a singular header
 #[derive(Serialize)]
 #[serde(crate = "rocket::serde")]
-pub struct ResHeader<'r> {
-    pub name: &'r str,
-    pub value: &'r str,
+pub struct ResHeader {
+    pub name: String,
+    pub value: String,
 }
 
 // represents a singular status code
 #[derive(Serialize)]
 #[serde(crate = "rocket::serde")]
-pub struct ResStatus<'r> {
-    pub status_code: &'r str,
-    pub status_reason: &'r str,
+pub struct ResStatus {
+    pub status_code: String,
+    pub status_reason: String,
 }
 
 // represents an object
 #[derive(Serialize)]
 #[serde(crate = "rocket::serde")]
-pub struct ResTiming<'r> {
-    pub response_time: &'r str,
+pub struct ResTiming {
+    pub response_time: String,
 }
 
 #[derive(Serialize)]
 #[serde(crate = "rocket::serde")]
-pub struct ReqInfo<'r> {
-    pub headers: Vec<ResHeader<'r>>,
-    pub status: ResStatus<'r>,
+pub struct ReqInfo {
+    pub headers: Vec<ResHeader>,
+    pub status: ResStatus,
     pub is_alive: bool,
-    pub timing: ResTiming<'r>,
+    pub timing: ResTiming,
 }
 
 #[derive(Serialize)]
 #[serde(crate = "rocket::serde")]
-pub struct SourceUrl<'r> {
-    pub url: &'r str,
+pub struct SourceUrl {
+    pub url: String,
 }
 
 #[derive(Serialize)]
 #[serde(crate = "rocket::serde")]
-pub struct ImageUrl<'r> {
-    pub url: &'r str,
-    pub alt: &'r str, // if none present just empty string
+pub struct ImageUrl {
+    pub url: String,
+    pub alt: String, // if none present just empty string
 }
 
 #[derive(Serialize)]
 #[serde(crate = "rocket::serde")]
-pub struct DocumentInfo<'r> {
-    pub source_code: &'r str, // as base64
-    pub page_title: &'r str, // for now only one, multiple could exits
-    pub css_urls: Vec<SourceUrl<'r>>,
-    pub js_urls: Vec<SourceUrl<'r>>,
-    pub img_urls: Vec<ImageUrl<'r>>,
-    pub link_urls: Vec<SourceUrl<'r>>,
+pub struct DocumentInfo {
+    pub source_code: String, // as base64
+    pub page_title: String, // for now only one, multiple could exits
+    pub css_urls: Vec<SourceUrl>,
+    pub js_urls: Vec<SourceUrl>,
+    pub img_urls: Vec<ImageUrl>,
+    pub link_urls: Vec<SourceUrl>,
 }
 
 #[derive(Serialize)]
 #[serde(crate = "rocket::serde")]
-pub struct TimeInfo<'r> {
-    pub created_at: &'r str,
-    pub timezone: &'r str,
+pub struct TimeInfo {
+    pub created_at: String,
+    pub timezone: String,
 }
 
 #[derive(Serialize)]
 #[serde(crate = "rocket::serde")]
-pub struct DetectedVulnerability<'r> {
-    pub cve: &'r str,
-    pub severity: &'r str, // should this be a number
-    pub description: &'r str,
-    // pub associated_packages: &'r str, // not sure if i need this
-    // pub layer_id: &'r str, // only for images
+pub struct DetectedVulnerability {
+    pub cve: String,
+    pub severity: String, // should this be a number
+    pub description: String,
+    // pub associated_packages: String, // not sure if i need this
+    // pub layer_id: String, // only for images
 }
 
 #[derive(Serialize)]
 #[serde(crate = "rocket::serde")]
-pub struct FrameworkInfo<'r> {
-    pub name: &'r str,    // detected by generator tag, robots.txt, or admin url
-    pub version: &'r str,
-    pub detected_vulnerabilities: Vec<DetectedVulnerability<'r>>,
-    pub server: &'r str,
+pub struct FrameworkInfo {
+    pub name: String,    // detected by generator tag, robots.txt, or admin url
+    pub version: String,
+    pub detected_vulnerabilities: Vec<DetectedVulnerability>,
+    pub server: String,
 }
 
 // this will be output to the client
 #[derive(Serialize)]
 #[serde(crate = "rocket::serde")]
-pub struct ScanResult<'r> {
-    pub url_info: UrlInfo<'r>,
-    pub req_info: ReqInfo<'r>,
-    pub document_info: DocumentInfo<'r>,
-    pub time_info: TimeInfo<'r>,
-    pub framework_info: FrameworkInfo<'r>,
+pub struct ScanResult {
+    pub url_info: UrlInfo,
+    pub req_info: ReqInfo,
+    pub document_info: DocumentInfo,
+    pub time_info: TimeInfo,
+    pub framework_info: FrameworkInfo,
 }

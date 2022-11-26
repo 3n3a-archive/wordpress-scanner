@@ -28,11 +28,11 @@ fn create_robots_txt_url(url: Url) -> String {
     url
 }
 
-pub async fn get_site<'r>(
+pub async fn get_site(
     url: Url,
 ) -> (
-    types::DocumentInfo<'r>,
-    types::ReqInfo<'r>,
+    types::DocumentInfo,
+    types::ReqInfo,
 ) {
     let client = reqwest::Client::new();
     let result: Response = make_req(client.clone(), url.as_str()).await;
@@ -41,54 +41,52 @@ pub async fn get_site<'r>(
     let result_robots = make_req(client.clone(), &robots_url).await;
     println!("robots.txt {}", &result_robots.text().await.unwrap());
 
-    let status: StatusCode = *&result.status().clone();
-    let status_code_string: String = status.to_string().to_owned();
-    let status_code: &str = Box::leak(status_code_string.into_boxed_str());
-    let status_reason: &str = status.canonical_reason().unwrap_or("");
-    let status: types::ResStatus = types::ResStatus { status_code: status_code, status_reason: status_reason };
+    let status = &result.status().clone();
+    let status_code = status.to_string();
+    let status_reason = status.canonical_reason().unwrap_or("").to_string();
+    let status: types::ResStatus = types::ResStatus { 
+        status_code: status_code, 
+        status_reason: status_reason,
+    };
 
     // Headers before .text()
     let boxed_result: Box<header::HeaderMap> = Box::new(result.headers().clone());
     let leaked_res = Box::leak(boxed_result);
     let headers_clone = leaked_res;
-    let mut headers: Vec<types::ResHeader<'r>> = Vec::new();
+    let mut headers: Vec<types::ResHeader> = Vec::new();
     for (key, value) in headers_clone.iter() {
-        let value_string = value.to_str().unwrap_or(&""); // unwrap_or because it fails with UTF-8 Symbols lol
-        let header_singular: types::ResHeader<'r> = types::ResHeader {
-            name: key.as_str(),
-            value: &value_string,
+        let value_string = value.to_str().unwrap_or(&"").to_string(); // unwrap_or because it fails with UTF-8 Symbols lol
+        let header_singular: types::ResHeader = types::ResHeader {
+            name: key.to_string(),
+            value: value_string,
         };
         headers.push(header_singular);
     }
 
     // .text() destroys the variable, like kinda
-    let source_code = Box::new(result.text().await.unwrap());
-    let source_code_str = Box::leak(source_code.into_boxed_str());
-    let source_code_b64 = Box::new(base64::encode(&source_code_str));
-    let source_code_b64_str = Box::leak(source_code_b64.into_boxed_str());
-    let (title, css_list, version) = parsers::parse_html(&source_code_str);
-    let title_boxed = Box::new(title);
-    let title_str = Box::leak(title_boxed.into_boxed_str());
+    let source_code = result.text().await.unwrap();
+    let source_code_b64 = base64::encode(&source_code);
+    let (title, css_list, version) = parsers::parse_html(&source_code);
 
-    let css_urls: Vec<types::SourceUrl<'r>> = Vec::new();
-    let js_urls: Vec<types::SourceUrl<'r>> = Vec::new();
-    let img_urls: Vec<types::ImageUrl<'r>> = Vec::new();
-    let link_urls: Vec<types::SourceUrl<'r>> = Vec::new();
+    let css_urls: Vec<types::SourceUrl> = Vec::new();
+    let js_urls: Vec<types::SourceUrl> = Vec::new();
+    let img_urls: Vec<types::ImageUrl> = Vec::new();
+    let link_urls: Vec<types::SourceUrl> = Vec::new();
 
-    let document_info: types::DocumentInfo<'r> = types::DocumentInfo {
-        source_code: source_code_b64_str,
-        page_title: title_str,
+    let document_info: types::DocumentInfo = types::DocumentInfo {
+        source_code: source_code_b64,
+        page_title: title,
         css_urls,
         js_urls,
         img_urls,
         link_urls,
     };
 
-    let req_info: types::ReqInfo<'r> = types::ReqInfo{
+    let req_info: types::ReqInfo = types::ReqInfo{
         headers,
         is_alive: true,
         status,
-        timing: types::ResTiming { response_time: "tbd" },
+        timing: types::ResTiming { response_time: "tbd".to_string() },
     };
 
     (document_info, req_info)
