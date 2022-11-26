@@ -1,4 +1,4 @@
-use reqwest::{self, header::{USER_AGENT, self}, Response, Client, Url, StatusCode};
+use reqwest::{self, header::{USER_AGENT, self, SERVER}, Response, Client, Url, StatusCode};
 use base64;
 use std::time::{Duration, Instant};
 
@@ -34,15 +34,16 @@ pub async fn get_site(
 ) -> (
     types::DocumentInfo,
     types::ReqInfo,
+    types::FrameworkInfo
 ) {
     let start = Instant::now();
 
     let client = reqwest::Client::new();
     let result: Response = make_req(client.clone(), url.as_str()).await;
 
-    let robots_url = create_robots_txt_url(url).to_owned();
-    let result_robots = make_req(client.clone(), &robots_url).await;
-    println!("robots.txt {}", &result_robots.text().await.unwrap());
+    // let robots_url = create_robots_txt_url(url).to_owned();
+    // let result_robots = make_req(client.clone(), &robots_url).await;
+    // println!("robots.txt {}", &result_robots.text().await.unwrap());
 
     let status = &result.status().clone();
     let status_code = status.to_string();
@@ -56,9 +57,16 @@ pub async fn get_site(
     let boxed_result: Box<header::HeaderMap> = Box::new(result.headers().clone());
     let leaked_res = Box::leak(boxed_result);
     let headers_clone = leaked_res;
+    
+    let mut server: String = "".to_string();
     let mut headers: Vec<types::ResHeader> = Vec::new();
     for (key, value) in headers_clone.iter() {
         let value_string = value.to_str().unwrap_or(&"").to_string(); // unwrap_or because it fails with UTF-8 Symbols lol
+        
+        if key == SERVER {
+            server = value_string.clone();
+        }
+        
         let header_singular: types::ResHeader = types::ResHeader {
             name: key.to_string(),
             value: value_string,
@@ -94,5 +102,12 @@ pub async fn get_site(
         timing: types::ResTiming { response_time: duration },
     };
 
-    (document_info, req_info)
+    let framework_info: types::FrameworkInfo = types::FrameworkInfo {
+        name: version.join(", "),
+        version: "tbd".to_string(),
+        server: server,
+        detected_vulnerabilities: vec![]
+    };
+
+    (document_info, req_info, framework_info)
 }
