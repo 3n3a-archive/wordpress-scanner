@@ -1,5 +1,6 @@
 use reqwest::{self, header::{USER_AGENT, self}, Response, Client, Url, StatusCode};
 use base64;
+use std::time::{Duration, Instant};
 
 mod config;
 mod parsers;
@@ -34,6 +35,8 @@ pub async fn get_site(
     types::DocumentInfo,
     types::ReqInfo,
 ) {
+    let start = Instant::now();
+
     let client = reqwest::Client::new();
     let result: Response = make_req(client.clone(), url.as_str()).await;
 
@@ -73,6 +76,8 @@ pub async fn get_site(
     let img_urls: Vec<types::ImageUrl> = Vec::new();
     let link_urls: Vec<types::SourceUrl> = Vec::new();
 
+    let duration: String = start.elapsed().as_millis().to_string() + " ms";
+
     let document_info: types::DocumentInfo = types::DocumentInfo {
         source_code: source_code_b64,
         page_title: title,
@@ -86,7 +91,7 @@ pub async fn get_site(
         headers,
         is_alive: true,
         status,
-        timing: types::ResTiming { response_time: "tbd".to_string() },
+        timing: types::ResTiming { response_time: duration },
     };
 
     (document_info, req_info)

@@ -6,6 +6,7 @@ use rocket::form::Form;
 use rocket::serde::json::Json;
 use rocket_dyn_templates::{context, Template};
 use types::ScanResult;
+
 // use url::Url;
 
 mod requestor;
@@ -30,8 +31,10 @@ fn index() -> Template {
 
 #[post("/", data = "<input>")]
 async fn scan_site(input: Form<types::ScanForm<'_>>) -> Json<types::ScanResult> {
+    
     let url_host = Url::parse(input.url).unwrap();
     let (document_info, req_info): (types::DocumentInfo, types::ReqInfo) = get_site(url_host.clone()).await;
+    
     let scan_result: ScanResult = ScanResult {
         url_info: types::UrlInfo {
             original_url: "https://example.com/index.html".to_string(),
