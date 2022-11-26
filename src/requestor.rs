@@ -79,6 +79,7 @@ pub async fn get_site(
     let source_code_b64 = base64::encode(&source_code);
     let (title, css_list, version) = parsers::parse_html(&source_code);
 
+    // TODO: add urls into custom types
     let css_urls: Vec<types::SourceUrl> = Vec::new();
     let js_urls: Vec<types::SourceUrl> = Vec::new();
     let img_urls: Vec<types::ImageUrl> = Vec::new();
