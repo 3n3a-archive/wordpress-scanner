@@ -1,8 +1,13 @@
-use reqwest::{self, header::USER_AGENT, Response, Client, Url};
-use std::collections::HashMap;
+use reqwest::{self, header::{USER_AGENT, self}, Response, Client, Url, StatusCode};
+use base64;
 
 mod config;
 mod parsers;
+
+// #[path="./types/mod.rs"]
+// pub mod types;
+
+use super::types;
 
 // makes a request with a random user-agent
 async fn make_req(client: Client, url: &str) -> Response {
@@ -23,46 +28,68 @@ fn create_robots_txt_url(url: Url) -> String {
     url
 }
 
-pub async fn get_site(
+pub async fn get_site<'r>(
     url: Url,
 ) -> (
-    String,
-    String,
-    HashMap<String, String>,
-    String,
-    String,
-    Vec<String>,
-    Vec<String>,
+    types::DocumentInfo<'r>,
+    types::ReqInfo<'r>,
 ) {
     let client = reqwest::Client::new();
-    let result = make_req(client.clone(), url.as_str()).await;
+    let result: Response = make_req(client.clone(), url.as_str()).await;
 
     let robots_url = create_robots_txt_url(url).to_owned();
     let result_robots = make_req(client.clone(), &robots_url).await;
     println!("robots.txt {}", &result_robots.text().await.unwrap());
 
-    let status_code: String = (*(&result.status().to_owned())).to_string();
-    let status_reason: String = (*(&result.status().canonical_reason().unwrap_or(""))).to_string();
+    let status: StatusCode = *&result.status().clone();
+    let status_code_string: String = status.to_string().to_owned();
+    let status_code: &str = Box::leak(status_code_string.into_boxed_str());
+    let status_reason: &str = status.canonical_reason().unwrap_or("");
+    let status: types::ResStatus = types::ResStatus { status_code: status_code, status_reason: status_reason };
 
     // Headers before .text()
-    let res_headers = &result.headers().clone(); // clone so can still return it (because .text() takes over ownership)
-    let mut headers = HashMap::new();
-    for (key, value) in res_headers.iter() {
-        let value_string = value.to_str().unwrap_or(&"").to_string(); // unwrap_or because it fails with UTF-8 Symbols lol
-        headers.insert(key.to_string(), value_string);
+    let boxed_result: Box<header::HeaderMap> = Box::new(result.headers().clone());
+    let leaked_res = Box::leak(boxed_result);
+    let headers_clone = leaked_res;
+    let mut headers: Vec<types::ResHeader<'r>> = Vec::new();
+    for (key, value) in headers_clone.iter() {
+        let value_string = value.to_str().unwrap_or(&""); // unwrap_or because it fails with UTF-8 Symbols lol
+        let header_singular: types::ResHeader<'r> = types::ResHeader {
+            name: key.as_str(),
+            value: &value_string,
+        };
+        headers.push(header_singular);
     }
 
     // .text() destroys the variable, like kinda
-    let source_code = &result.text().await.unwrap();
-    let (title, css_list, version) = parsers::parse_html(&source_code);
+    let source_code = Box::new(result.text().await.unwrap());
+    let source_code_str = Box::leak(source_code.into_boxed_str());
+    let source_code_b64 = Box::new(base64::encode(&source_code_str));
+    let source_code_b64_str = Box::leak(source_code_b64.into_boxed_str());
+    let (title, css_list, version) = parsers::parse_html(&source_code_str);
+    let title_boxed = Box::new(title);
+    let title_str = Box::leak(title_boxed.into_boxed_str());
 
-    (
-        title,
-        source_code.to_owned(),
+    let css_urls: Vec<types::SourceUrl<'r>> = Vec::new();
+    let js_urls: Vec<types::SourceUrl<'r>> = Vec::new();
+    let img_urls: Vec<types::ImageUrl<'r>> = Vec::new();
+    let link_urls: Vec<types::SourceUrl<'r>> = Vec::new();
+
+    let document_info: types::DocumentInfo<'r> = types::DocumentInfo {
+        source_code: source_code_b64_str,
+        page_title: title_str,
+        css_urls,
+        js_urls,
+        img_urls,
+        link_urls,
+    };
+
+    let req_info: types::ReqInfo<'r> = types::ReqInfo{
         headers,
-        status_code,
-        status_reason,
-        css_list,
-        version,
-    )
+        is_alive: true,
+        status,
+        timing: types::ResTiming { response_time: "tbd" },
+    };
+
+    (document_info, req_info)
 }

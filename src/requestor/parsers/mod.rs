@@ -1,6 +1,8 @@
+use std::str;
+use base64;
 use lol_html::{element, rewrite_str, text, RewriteStrSettings};
 
-pub fn parse_html(html: &String) -> (String, Vec<String>, Vec<String>) {
+pub fn parse_html(html: &str) -> (String, Vec<String>, Vec<String>) {
     let mut global_title: String = String::new();
     let mut global_css_list = Vec::new();
     let mut global_version: Vec<String> = Vec::new();
@@ -29,7 +31,7 @@ pub fn parse_html(html: &String) -> (String, Vec<String>, Vec<String>) {
         }),
     ];
     rewrite_str(
-        html.as_str(),
+        html,
         RewriteStrSettings {
             element_content_handlers,
             ..RewriteStrSettings::default()
