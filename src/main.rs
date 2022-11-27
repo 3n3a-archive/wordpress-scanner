@@ -1,9 +1,9 @@
 #[macro_use]
 extern crate rocket;
-use rocket::form::Form;
-use rocket_dyn_templates::{context, Template};
-use url::Url;
 
+use rocket::serde::json::Json;
+
+mod scanner;
 mod requestor;
 mod types;
 
@@ -12,37 +12,15 @@ fn rocket() -> _ {
     rocket::build()
         .mount("/", routes![index])
         .mount("/scan", routes![scan_site])
-        .attach(Template::fairing())
 }
 
 #[get("/")]
-fn index() -> Template {
-    let context = context! {
-        title: "Wordpress Scanner"
-    };
-    Template::render("index", &context)
+fn index() -> Json<types::ServerInfo> {
+    Json(types::ServerInfo { name: "Wordpress Scanner".to_string(), version: "0.3.0".to_string() })
 }
 
-#[post("/", data = "<input>")]
-async fn scan_site(input: Form<types::ScanForm<'_>>) -> Template {
-    let url_host = Url::parse(input.url).unwrap();
-    let (source_title, source_code, headers, status_code, status_reason, css_list, version_list) =
-        requestor::get_site(input.url).await;
-
-    // println!("{:#?}", &css_list.as_slice());
-
-    let context = context! {
-        title: "Scan Result",
-        url: input.url,
-        url_host: url_host.host_str(),
-        headers: &headers,
-        status_code: status_code,
-        status_reason: status_reason,
-        source_title: source_title,
-        source_code: source_code,
-        source_version: &version_list.as_slice(),
-        css_list: &css_list.as_slice(),
-    };
-
-    Template::render("scan", &context)
+#[post("/", format = "json", data = "<input>")]
+async fn scan_site(input: Json<types::WebScanInput<'_>>) -> Json<types::ScanResult> {
+    let scan_result = scanner::scan_site(input.url).await;
+    Json(scan_result)
 }

@@ -1,89 +1,105 @@
-use reqwest;
-use std::collections::HashMap;
+use reqwest::{self, header::{USER_AGENT, self, SERVER}, Response, Client, Url};
+use base64;
+use std::time::Instant;
 
-mod parsers {
-    use lol_html::{element, rewrite_str, text, RewriteStrSettings};
+mod config;
+mod parsers;
 
-    pub fn parse_html(html: &String) -> (String, Vec<String>, Vec<String>) {
-        let mut global_title: String = String::new();
-        let mut global_css_list = Vec::new();
-        let mut global_version: Vec<String> = Vec::new();
+use super::types;
 
-        let mut r_global_version = &mut global_version;
-
-        let element_content_handlers = vec![
-            text!("head > title", |t| {
-                global_title += t.as_str();
-                if t.last_in_text_node() {
-                    global_title += "";
-                }
-                Ok(())
-            }),
-            element!("head > link[rel=\"stylesheet\"]", |e| {
-                // push into vector or so
-                let href = e.get_attribute("href").unwrap();
-                global_css_list.push(href);
-                Ok(())
-            }),
-            element!("head > meta[name=\"generator\" i]", |e| {
-                let r1_gv = &mut r_global_version;
-                let version = e.get_attribute("content").unwrap();
-                r1_gv.push(version);
-                Ok(())
-            }),
-        ];
-        rewrite_str(
-            html.as_str(),
-            RewriteStrSettings {
-                element_content_handlers,
-                ..RewriteStrSettings::default()
-            },
-        )
-        .unwrap();
-        return (global_title, global_css_list, global_version);
-    }
-}
-
-pub async fn get_site(
-    url: &str,
-) -> (
-    String,
-    String,
-    HashMap<String, String>,
-    String,
-    String,
-    Vec<String>,
-    Vec<String>,
-) {
-    let client = reqwest::Client::new();
+// makes a request with a random user-agent
+async fn make_req(client: Client, url: &str) -> Response {
     let result = client.get(url)
-        .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36")
+        .header(USER_AGENT, config::get_random_user_agent())
         .send()
         .await // no '?' because we'd have to use Result as return type
         .unwrap();
+    result
+}
 
-    let status_code: String = (*(&result.status().to_owned())).to_string();
-    let status_reason: String = (*(&result.status().canonical_reason().unwrap_or(""))).to_string();
+// fn create_robots_txt_url(url: Url) -> String {
+//     const ROBOTS_TXT: &'static str = "robots.txt";
+//     let schema = url.scheme();
+//     let host = url.host_str().unwrap();
+//     let port = url.port_or_known_default().unwrap();
+//     let url: String = format!("{}://{}:{}/{}", schema, host, port, ROBOTS_TXT);
+//     url
+// }
+
+pub async fn get_site(
+    url: Url,
+) -> (
+    types::DocumentInfo,
+    types::ReqInfo,
+    types::FrameworkInfo
+) {
+    let start = Instant::now();
+
+    let client = reqwest::Client::new();
+    let result: Response = make_req(client.clone(), url.as_str()).await;
+
+    // let robots_url = create_robots_txt_url(url).to_owned();
+    // let result_robots = make_req(client.clone(), &robots_url).await;
+    // println!("robots.txt {}", &result_robots.text().await.unwrap());
+
+    let status = &result.status().clone();
+    let status_code = status.to_string();
+    let status_reason = status.canonical_reason().unwrap_or("").to_string();
+    let status: types::ResStatus = types::ResStatus { 
+        status_code: status_code, 
+        status_reason: status_reason,
+    };
 
     // Headers before .text()
-    let res_headers = &result.headers().clone(); // clone so can still return it (because .text() takes over ownership)
-    let mut headers = HashMap::new();
-    for (key, value) in res_headers.iter() {
+    let boxed_result: Box<header::HeaderMap> = Box::new(result.headers().clone());
+    let leaked_res = Box::leak(boxed_result);
+    let headers_clone = leaked_res;
+    
+    let mut server: String = "".to_string();
+    let mut headers: Vec<types::ResHeader> = Vec::new();
+    for (key, value) in headers_clone.iter() {
         let value_string = value.to_str().unwrap_or(&"").to_string(); // unwrap_or because it fails with UTF-8 Symbols lol
-        headers.insert(key.to_string(), value_string);
+        
+        if key == SERVER {
+            server = value_string.clone();
+        }
+        
+        let header_singular: types::ResHeader = types::ResHeader {
+            name: key.to_string(),
+            value: value_string,
+        };
+        headers.push(header_singular);
     }
 
     // .text() destroys the variable, like kinda
-    let source_code = &result.text().await.unwrap();
-    let (title, css_list, version) = parsers::parse_html(&source_code);
+    let source_code = result.text().await.unwrap();
+    let source_code_b64 = base64::encode(&source_code);
+    let parse_result: parsers::DocumentSubsetInfo = parsers::parse_html(&source_code);
 
-    (
-        title,
-        source_code.to_owned(),
+    let duration: String = start.elapsed().as_millis().to_string() + " ms";
+
+    let document_info: types::DocumentInfo = types::DocumentInfo {
+        source_code: source_code_b64,
+        page_title: parse_result.title,
+        css_urls: parse_result.css_urls,
+        js_urls: parse_result.js_urls,
+        img_urls: parse_result.img_urls,
+        link_urls: parse_result.link_urls,
+    };
+
+    let req_info: types::ReqInfo = types::ReqInfo{
         headers,
-        status_code,
-        status_reason,
-        css_list,
-        version,
-    )
+        is_alive: true,
+        status,
+        timing: types::ResTiming { response_time: duration },
+    };
+
+    let framework_info: types::FrameworkInfo = types::FrameworkInfo {
+        name: parse_result.generator_info.join(", "),
+        version: "tbd".to_string(),
+        server: server,
+        detected_vulnerabilities: vec![]
+    };
+
+    (document_info, req_info, framework_info)
 }
