@@ -9,6 +9,7 @@ cargo build --release
 ls -lha target/release/wordpress-scanner
 
 # compresss
+sleep 1
 upx -9 target/release/wordpress-scanner
 
 # show how much
