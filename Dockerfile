@@ -1,7 +1,7 @@
 FROM rust:latest AS builder
 
 RUN rustup target add x86_64-unknown-linux-musl
-RUN apt update && apt install -y musl-tools musl-dev openssl build-essential libssl-dev pkg-config
+RUN apt update && apt install -y musl-tools musl-dev openssl build-essential libssl-dev pkg-config upx
 RUN update-ca-certificates
 
 # Create appuser
@@ -23,6 +23,7 @@ WORKDIR /app
 COPY ./ .
 
 RUN cargo build --target x86_64-unknown-linux-musl --release
+RUN upx -9 target/x86_64-unknown-linux-musl/release/wordpress-scanner
 
 ####################################################################################
 
@@ -36,8 +37,6 @@ WORKDIR /app
 
 # Copy our build
 COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/wordpress-scanner ./
-COPY --from=builder /app/templates/ ./templates/
-RUN ls -lha ./templates
 
 # Use an unprivileged user.
 USER app:app
