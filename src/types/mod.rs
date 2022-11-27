@@ -1,11 +1,18 @@
-use rocket::serde::Serialize;
+use rocket::serde::{Serialize, Deserialize};
 
-#[derive(FromForm)]
-pub struct ScanForm<'r> {
-    #[field(default = "https://wordpress.org")]
+// what the server receives from a client
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug)]
+#[serde(crate = "rocket::serde")]
+pub struct WebScanInput<'r> {
     pub url: &'r str,
 }
 
+#[derive(Serialize)]
+#[serde(crate = "rocket::serde")]
+pub struct ServerInfo {
+    pub name: String,
+    pub version: String,
+}
 
 // Related to Scan Result
 

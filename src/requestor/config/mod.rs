@@ -19,9 +19,9 @@ static USER_AGENTS: Map<&'static str, &'static str> = phf_map! {
 };
 
 // for getting a specific user agent out of the set
-pub fn get_user_agent(key: &str) -> &'static str {
-    return USER_AGENTS[key];
-}
+// pub fn get_user_agent(key: &str) -> &'static str {
+//     return USER_AGENTS[key];
+// }
 
 // will return a random user agent
 pub fn get_random_user_agent() -> &'static str {

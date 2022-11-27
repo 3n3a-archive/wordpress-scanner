@@ -1,12 +1,9 @@
-use reqwest::{self, header::{USER_AGENT, self, SERVER}, Response, Client, Url, StatusCode};
+use reqwest::{self, header::{USER_AGENT, self, SERVER}, Response, Client, Url};
 use base64;
-use std::time::{Duration, Instant};
+use std::time::Instant;
 
 mod config;
 mod parsers;
-
-// #[path="./types/mod.rs"]
-// pub mod types;
 
 use super::types;
 
@@ -20,14 +17,14 @@ async fn make_req(client: Client, url: &str) -> Response {
     result
 }
 
-fn create_robots_txt_url(url: Url) -> String {
-    const ROBOTS_TXT: &'static str = "robots.txt";
-    let schema = url.scheme();
-    let host = url.host_str().unwrap();
-    let port = url.port_or_known_default().unwrap();
-    let url: String = format!("{}://{}:{}/{}", schema, host, port, ROBOTS_TXT);
-    url
-}
+// fn create_robots_txt_url(url: Url) -> String {
+//     const ROBOTS_TXT: &'static str = "robots.txt";
+//     let schema = url.scheme();
+//     let host = url.host_str().unwrap();
+//     let port = url.port_or_known_default().unwrap();
+//     let url: String = format!("{}://{}:{}/{}", schema, host, port, ROBOTS_TXT);
+//     url
+// }
 
 pub async fn get_site(
     url: Url,
@@ -77,23 +74,17 @@ pub async fn get_site(
     // .text() destroys the variable, like kinda
     let source_code = result.text().await.unwrap();
     let source_code_b64 = base64::encode(&source_code);
-    let (title, css_list, version) = parsers::parse_html(&source_code);
-
-    // TODO: add urls into custom types
-    let css_urls: Vec<types::SourceUrl> = Vec::new();
-    let js_urls: Vec<types::SourceUrl> = Vec::new();
-    let img_urls: Vec<types::ImageUrl> = Vec::new();
-    let link_urls: Vec<types::SourceUrl> = Vec::new();
+    let parse_result: parsers::DocumentSubsetInfo = parsers::parse_html(&source_code);
 
     let duration: String = start.elapsed().as_millis().to_string() + " ms";
 
     let document_info: types::DocumentInfo = types::DocumentInfo {
         source_code: source_code_b64,
-        page_title: title,
-        css_urls,
-        js_urls,
-        img_urls,
-        link_urls,
+        page_title: parse_result.title,
+        css_urls: parse_result.css_urls,
+        js_urls: parse_result.js_urls,
+        img_urls: parse_result.img_urls,
+        link_urls: parse_result.link_urls,
     };
 
     let req_info: types::ReqInfo = types::ReqInfo{
@@ -104,7 +95,7 @@ pub async fn get_site(
     };
 
     let framework_info: types::FrameworkInfo = types::FrameworkInfo {
-        name: version.join(", "),
+        name: parse_result.generator_info.join(", "),
         version: "tbd".to_string(),
         server: server,
         detected_vulnerabilities: vec![]
