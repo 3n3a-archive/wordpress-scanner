@@ -1,7 +1,7 @@
 #[macro_use]
 extern crate rocket;
 
-use rocket::{serde::{json::Json, Deserialize}, fairing::AdHoc, State};
+use rocket::{serde::{json::Json, Deserialize}, fairing::AdHoc};
 
 mod scanner;
 mod requestor;
