@@ -15,3 +15,9 @@
 
 * See the `markdown-server` project
 * once_cell's **lazy**
+
+## Custom ENV Variables in Rocket
+
+* ROCKET_BASE_URL
+* ROCKET_USERNAME
+* ROCKET_PASSWORD

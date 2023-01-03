@@ -1,4 +1,8 @@
-use rocket::serde::{Serialize, Deserialize};
+use std::collections::HashMap;
+
+use rocket::{serde::{Serialize, Deserialize}, request::{FromRequest, self, Outcome}, http::Status};
+
+use crate::Config;
 
 // what the server receives from a client
 #[derive(Serialize, Deserialize, PartialEq, Eq, Debug)]
@@ -170,4 +174,107 @@ pub struct ScanResult {
     pub document_info: DocumentInfo,
     pub time_info: TimeInfo,
     pub framework_info: FrameworkInfo,
+}
+
+// Error
+#[derive(Serialize)]
+#[serde(crate = "rocket::serde")]
+pub struct ErrorResult {
+    /// The title of the error message
+    pub err: String,
+    /// The description of the error
+    pub msg: Option<String>,
+    // HTTP Status Code returned
+    #[serde(skip)]
+    pub http_status_code: u16,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(crate = "rocket::serde")]
+pub struct ApiKeyVerifyResponse {
+    pub message: String,
+    pub data: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(crate = "rocket::serde")]
+pub struct ApiKeyToken {
+    pub token: String,
+    pub token_type: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(crate = "rocket::serde")]
+pub struct ApiKeyLoginResponse {
+    pub message: String,
+    pub data: ApiKeyToken,
+}
+
+
+
+
+// Implement the actual checks for the authentication
+pub struct ApiKey(String);
+
+// Function for Verifying API Key
+async fn verify_key(key: String, config: &Config) -> bool {
+    let client = reqwest::Client::new();
+
+    // Login as user, to get JWT
+    let mut login_map = HashMap::new();
+    login_map.insert("username_or_email", &config.username);
+    login_map.insert("password", &config.password);
+    let aklg = client.post(format!("{}{}", config.base_url, "/api/auth/login"))
+        .json(&login_map)
+        .send()
+        .await
+        .unwrap()
+        .json::<ApiKeyLoginResponse>()
+        .await
+        .unwrap();
+
+
+    //println!("login: {:?}", aklg);
+
+    // Verify API Key with JWT in Header
+    let mut verify_map = HashMap::new();
+    verify_map.insert("api_key", key);
+    let akvr: ApiKeyVerifyResponse = client.post(format!("{}{}", config.base_url, "/api/api-key/verify"))
+        .json(&verify_map)
+        .header(reqwest::header::AUTHORIZATION, format!("Bearer {}", aklg.data.token))
+        .send()
+        .await
+        .unwrap()
+        .json::<ApiKeyVerifyResponse>()
+        .await
+        .unwrap();
+
+    //println!("verify: {:?}", akvr);
+
+    match akvr.message.as_str() {
+        "ok" => true,
+        _ => false,
+    }
+}
+
+#[rocket::async_trait]
+impl<'a> FromRequest<'a> for ApiKey {
+    type Error = &'static str;
+    async fn from_request(
+        request: &'a request::Request<'_>,
+    ) -> request::Outcome<Self, Self::Error> {
+        // Get the key from the http header
+        match request.headers().get_one("x-api-key") {
+            Some(key) => {
+                let config = request.rocket().state::<Config>().unwrap();
+                if verify_key(key.to_string(), config).await {
+                    Outcome::Success(ApiKey(key.to_owned()))
+                } else {
+                    Outcome::Failure((Status::Unauthorized, "Api key is invalid."))
+                }
+            }
+            None => Outcome::Failure((Status::BadRequest, "Missing `x-api-key` header.")),
+        }
+        // For more info see: https://rocket.rs/v0.5-rc/guide/state/#within-guards
+    }
 }

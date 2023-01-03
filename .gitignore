@@ -2,3 +2,4 @@ target/
 files/*
 docs/generated/*
 !.gitkeep
+Rocket.toml
